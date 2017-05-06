@@ -1,55 +1,65 @@
-
 const St = imports.gi.St;
 const Main = imports.ui.main;
-const Tweener = imports.ui.tweener;
+const Lang = imports.lang;
+const PanelMenu = imports.ui.panelMenu;
+const PopupMenu = imports.ui.popupMenu;
+const Slider = imports.ui.slider;
+const Clutter = imports.gi.Clutter;
+const GLib = imports.gi.GLib;
+const Gio = imports.gi.Gio;
+const Util = imports.misc.util;
+const Mainloop = imports.mainloop;
 
-let text, button;
+//let event = null;
 
-function _hideHello() {
-    Main.uiGroup.remove_actor(text);
-    text = null;
+const FreqAudio = new Lang.Class({
+    Name: 'FreqAudio',
+    Extends: PanelMenu.Button,
+
+    _init: function () {
+        this.parent (0.0, "Freq change pulseaudio", false);   
+
+        this.statusLabel = new St.Label ({text: "FreqAudio", y_expand: true, y_align: Clutter.ActorAlign.CENTER});
+        let _box = new St.BoxLayout();
+        _box.add_actor(this.statusLabel);
+        this.actor.add_actor(_box);
+
+       
+    },
+
+    _read_line: function (dis) {
+        let line;
+        try {
+            dis.seek (0, GLib.SeekType.SET, null);
+            [line,] = dis.read_line (null);
+        } catch (e) {
+            print ("Error: ", e.message);
+            this._init_streams ();
+        }
+        return line;
+    },
+
+});
+
+
+// LOAD PART
+// =========
+
+
+let freqAudio;
+
+function init () {
 }
 
-function _showHello() {
-    if (!text) {
-        text = new St.Label({ style_class: 'helloworld-label', text: "Hello, asdfasdf!" });
-        Main.uiGroup.add_actor(text);
-    }
-
-    text.opacity = 255;
-
-    let monitor = Main.layoutManager.primaryMonitor;
-
-    //text.set_position(monitor.x + Math.floor(monitor.width / 2 - text.width / 1.5),
-    //                 monitor.y + Math.floor(monitor.height / 2 - text.height / 2));
-
-    text.set_position(monitor.x+ 200, monitor.y);
-
-    Tweener.addTween(text,
-                     { opacity: 0,
-                       time: 2,
-                       transition: 'easeOutQuad',
-                       onComplete: _hideHello });
+function enable () {
+  freqAudio = new FreqAudio;
+  // addToStatusArea se refiere a que lo va a añadir a la parte del panel
+  // donde esta el estado de las cosas, no en el desplegablel de la esquina.
+  Main.panel.addToStatusArea('freqAudio', freqAudio);
 }
 
-function init() {
-    button = new St.Bin({ style_class: 'panel-button',
-                          reactive: true,
-                          can_focus: true,
-                          x_fill: true,
-                          y_fill: false,
-                          track_hover: true });
-    let icon = new St.Icon({ icon_name: 'system-run-symbolic',
-                             style_class: 'system-status-icon' });
-
-    button.set_child(icon);
-    button.connect('button-press-event', _showHello);
-}
-
-function enable() {
-    Main.panel._rightBox.insert_child_at_index(button, 0);
-}
-
-function disable() {
-    Main.panel._rightBox.remove_child(button);
+function disable () {
+  freqAudio.destroy();
+  //Mainloop.source_remove(event);
+  freqAudio = null;
 }
