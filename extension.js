@@ -16,7 +16,10 @@ const ExtensionSystem = imports.ui.extensionSystem;
 const Me = ExtensionUtils.getCurrentExtension ();
 const EXTENSIONDIR = Me.dir.get_path ();
 const PROPERTY_SAMPLE_RATE = "default-sample-rate"
+const PROPERTY_FORMAT = "default-sample-format";
 const RATES = ["44100", "48000", "96000", "192000"];
+const FORMAT = ["u8", "s16le", "s16be", "s24le", "s24be2", "s24-32le", "s24-32be2" ,"s32le", "s32be", "float32le", "float32be",
+ "ulaw", "alaw"];
 
 const FreqAudio = new Lang.Class({
     Name: 'FreqAudio',
@@ -41,6 +44,16 @@ const FreqAudio = new Lang.Class({
             }));
         }
         
+        this.formatMenu = new PopupMenu.PopupSubMenuMenuItem('Format', false);
+        this.menu.addMenuItem (this.formatMenu);
+
+        for (let i = 0; i < FORMAT.length; i++) {
+            let menuItem = new PopupMenu.PopupMenuItem (FORMAT[i]);
+            this.formatMenu.menu.addMenuItem (menuItem);
+             menuItem.connect ('activate', Lang.bind (this, function (object, event) {
+                this._change_format(object.label.text);    
+            }));
+        }
     },
 
     _change_sample_rate: function(rate) {
@@ -51,6 +64,16 @@ const FreqAudio = new Lang.Class({
         // [1] string devuelta
         if(! changer_output[0]) {
             this.sampleRatesMenu.label.set_text("Failed Setting Sample Rate.");
+        }
+    },
+
+    _change_format: function(format) {
+        this.formatMenu.label.set_text("Format: " + format);
+        changer_output = GLib.spawn_command_line_sync (EXTENSIONDIR + "/genericChanger " + PROPERTY_FORMAT+ " " + format);
+        // [0] exit code
+        // [1] string devuelta
+        if(! changer_output[0]) {
+            this.formatMenu.label.set_text("Failed Setting Format.");
         }
     },
 
