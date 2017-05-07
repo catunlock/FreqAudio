@@ -1,0 +1,16 @@
+#!/bin/bash
+
+echo "$1" >> /home/xaloc/intentos
+
+LINE=$(sed '/resample-method/!d;=' ~/.config/pulse/daemon.conf | head -n 1)
+
+if [ -z "$LINE" ]; then
+    echo "Resample method added to the config file."
+    echo "resample-method = $1" >> ~/.config/pulse/daemon.conf
+fi
+
+if [ -n "$LINE" ]; then
+    echo "Resample method changed in the config file."
+    newLine="resample-method = $1"
+    sed -i "${LINE}s/.*/${newLine}/" ~/.config/pulse/daemon.conf
+fi
