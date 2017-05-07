@@ -24,16 +24,54 @@ const FreqAudio = new Lang.Class({
         _box.add_actor(this.statusLabel);
         this.actor.add_actor(_box);
 
-        this.activeg = new PopupMenu.PopupSubMenuMenuItem('Sample Rates', false);
-        this.menu.addMenuItem (this.activeg);
+        this.sampleRatesMenu = new PopupMenu.PopupSubMenuMenuItem('Sample Rates', false);
+        this.menu.addMenuItem (this.sampleRatesMenu);
 
-        let sample1 = new PopupMenu.PopupMenuItem ('44100');
-        this.activeg.menu.addMenuItem (sample1);
+        let rates = ["44100", "48000", "96000", "192000"];
+        for each (let rate in rates) {
+           let rateMenu = new PopupMenu.PopupMenuItem(rate + " Hz");
+           this.sampleRatesMenu.menu.addMenuItem(rateMenu);
+
+           rateMenu.connect ('activate', Lang.bind (this, function () {
+                //this._change_sample_rate(rate+"sdf");    
+                this.sampleRatesMenu.label.set_text("Sample Rate: " + rate + " Hz" );
+                }
+            )
+            );
+        }
+
+        /*
+        let sample1 = new PopupMenu.PopupMenuItem ('44100 Hz');
+        let sample2 = new PopupMenu.PopupMenuItem ('48000 Hz');
+        let sample3 = new PopupMenu.PopupMenuItem ('96000 Hz');
+        let sample4 = new PopupMenu.PopupMenuItem ('192000 Hz');
+        this.sampleRatesMenu.menu.addMenuItem (sample1);
+        this.sampleRatesMenu.menu.addMenuItem (sample2);
+        this.sampleRatesMenu.menu.addMenuItem (sample3);
+        this.sampleRatesMenu.menu.addMenuItem (sample4);
 
         sample1.connect ('activate', Lang.bind (this, function () {
-            // This works!!
-            this.activeg.label.set_text("44100");
+            this._change_sample_rate("44100");    
         }));
+
+        sample2.connect ('activate', Lang.bind (this, function () {
+            this._change_sample_rate("48000");    
+        }));
+
+        sample3.connect ('activate', Lang.bind (this, function () {
+            this._change_sample_rate("96000");    
+        }));
+
+        sample4.connect ('activate', Lang.bind (this, function () {
+            this._change_sample_rate("192000");    
+        }));
+
+        */
+    },
+
+    _change_sample_rate: function(rate) {
+        // This works!!
+        this.sampleRatesMenu.label.set_text("Sample Rate: " + rate + " Hz" );
     },
 
     _read_line: function (dis) {
