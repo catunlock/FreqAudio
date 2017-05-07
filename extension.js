@@ -24,7 +24,16 @@ const FreqAudio = new Lang.Class({
         _box.add_actor(this.statusLabel);
         this.actor.add_actor(_box);
 
-       
+        this.activeg = new PopupMenu.PopupSubMenuMenuItem('Sample Rates', false);
+        this.menu.addMenuItem (this.activeg);
+
+        let sample1 = new PopupMenu.PopupMenuItem ('44100');
+        this.activeg.menu.addMenuItem (sample1);
+
+        sample1.connect ('activate', Lang.bind (this, function () {
+            // This works!!
+            this.activeg.label.set_text("44100");
+        }));
     },
 
     _read_line: function (dis) {
