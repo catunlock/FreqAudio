@@ -1,0 +1,16 @@
+#!/bin/bash
+
+echo "$1" >> /home/xaloc/intentos
+
+LINE=$(sed '/default-sample-rate/!d;=' ~/.config/pulse/daemon.conf | head -n 1)
+
+if [ -z "$LINE" ]; then
+    echo "Sample rate added to the config file."
+    echo "default-sample-rate = $1" >> ~/.config/pulse/daemon.conf
+fi
+
+if [ -n "$LINE" ]; then
+    echo "Sample rate changed in the config file."
+    newLine="default-sample-rate = $1"
+    sed -i "${LINE}s/.*/${newLine}/" ~/.config/pulse/daemon.conf
+fi

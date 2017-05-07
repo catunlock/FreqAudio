@@ -11,6 +11,11 @@ const Util = imports.misc.util;
 const Mainloop = imports.mainloop;
 
 //let event = null;
+const ExtensionUtils = imports.misc.extensionUtils;
+const ExtensionSystem = imports.ui.extensionSystem;
+const Me = ExtensionUtils.getCurrentExtension ();
+const EXTENSIONDIR = Me.dir.get_path ();
+
 
 const FreqAudio = new Lang.Class({
     Name: 'FreqAudio',
@@ -27,20 +32,6 @@ const FreqAudio = new Lang.Class({
         this.sampleRatesMenu = new PopupMenu.PopupSubMenuMenuItem('Sample Rates', false);
         this.menu.addMenuItem (this.sampleRatesMenu);
 
-        let rates = ["44100", "48000", "96000", "192000"];
-        for each (let rate in rates) {
-           let rateMenu = new PopupMenu.PopupMenuItem(rate + " Hz");
-           this.sampleRatesMenu.menu.addMenuItem(rateMenu);
-
-           rateMenu.connect ('activate', Lang.bind (this, function () {
-                //this._change_sample_rate(rate+"sdf");    
-                this.sampleRatesMenu.label.set_text("Sample Rate: " + rate + " Hz" );
-                }
-            )
-            );
-        }
-
-        /*
         let sample1 = new PopupMenu.PopupMenuItem ('44100 Hz');
         let sample2 = new PopupMenu.PopupMenuItem ('48000 Hz');
         let sample3 = new PopupMenu.PopupMenuItem ('96000 Hz');
@@ -66,12 +57,16 @@ const FreqAudio = new Lang.Class({
             this._change_sample_rate("192000");    
         }));
 
-        */
+        
     },
 
     _change_sample_rate: function(rate) {
         // This works!!
         this.sampleRatesMenu.label.set_text("Sample Rate: " + rate + " Hz" );
+        cpufreq_output = GLib.spawn_command_line_sync (EXTENSIONDIR + "/sampleRate " + rate);
+        if(cpufreq_output[0]) {
+            this.sampleRatesMenu.label.set_text("Funciono");
+        }
     },
 
     _read_line: function (dis) {
