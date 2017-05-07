@@ -15,6 +15,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const ExtensionSystem = imports.ui.extensionSystem;
 const Me = ExtensionUtils.getCurrentExtension ();
 const EXTENSIONDIR = Me.dir.get_path ();
+const PROPERTY_SAMPLE_RATE = "default-sample-rate"
 
 
 const FreqAudio = new Lang.Class({
@@ -58,14 +59,17 @@ const FreqAudio = new Lang.Class({
         }));
 
         
+        
     },
 
     _change_sample_rate: function(rate) {
         // This works!!
         this.sampleRatesMenu.label.set_text("Sample Rate: " + rate + " Hz" );
-        cpufreq_output = GLib.spawn_command_line_sync (EXTENSIONDIR + "/sampleRate " + rate);
-        if(cpufreq_output[0]) {
-            this.sampleRatesMenu.label.set_text("Funciono");
+        changer_output = GLib.spawn_command_line_sync (EXTENSIONDIR + "/genericChanger " + PROPERTY_SAMPLE_RATE+ " " + rate);
+        // [0] exit code
+        // [1] string devuelta
+        if(! changer_output[0]) {
+            this.sampleRatesMenu.label.set_text("Failed Setting Sample Rate.");
         }
     },
 
