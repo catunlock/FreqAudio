@@ -1,0 +1,33 @@
+#!/bin/bash
+
+PROPERTY=$1
+VALUE=$2
+
+newLine="$PROPERTY = $VALUE"
+echo $newLine >> /home/xaloc/intentos
+
+FILE="$HOME/.config/pulse/daemon.conf"
+
+if [ ! -f $FILE ]; then
+    echo "$FILE not found. Creating"
+    echo $newLine >> $FILE
+    exit
+fi
+
+LINE=$(sed "/${PROPERTY}/!d;=" $FILE | head -n 1)
+
+if [ -z "$LINE" ]; then
+    echo "$PROPERTY added to the config file."
+    echo $newLine >> $FILE
+fi
+
+if [ -n "$LINE" ]; then
+    echo "$PROPERTY changed in the config file."
+    sed -i "${LINE}s/.*/${newLine}/" $FILE
+fi
+
+
+echo "Stopping pulseaudio service..."
+pulseaudio -k
+echo "Starting pulseaudio service..."
+pulseaudio --start -vvvvvvv
