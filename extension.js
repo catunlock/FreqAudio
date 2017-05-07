@@ -17,6 +17,9 @@ const Me = ExtensionUtils.getCurrentExtension ();
 const EXTENSIONDIR = Me.dir.get_path ();
 const PROPERTY_SAMPLE_RATE = "default-sample-rate"
 const PROPERTY_FORMAT = "default-sample-format";
+const PROPERTY_SAMPLER = "resample-method";
+const CMD_STATUS = EXTENSIONDIR + "/getPulseStatus"
+const CMD_GET_RESAMPLERS = "pulseaudio --dump-resample-methods"
 const RATES = ["44100", "48000", "96000", "192000"];
 const FORMAT = ["u8", "s16le", "s16be", "s24le", "s24be2", "s24-32le", "s24-32be2" ,"s32le", "s32be", "float32le", "float32be",
  "ulaw", "alaw"];
@@ -54,14 +57,34 @@ const FreqAudio = new Lang.Class({
                 this._change_format(object.label.text);    
             }));
         }
+
+        this.samplerMenu = new PopupMenu.PopupSubMenuMenuItem('Sampler', false);
+        this.menu.addMenuItem (this.samplerMenu);
+
+        let cmd_sampler = GLib.spawn_command_line_sync (CMD_GET_RESAMPLERS);
+        let samplers_available = cmd_sampler[1].toString().split("\n");
+
+        for (let i = 0; i < samplers_available.length; i++) {
+            let menuItem = new PopupMenu.PopupMenuItem (samplers_available[i]);
+            this.samplerMenu.menu.addMenuItem (menuItem);
+            menuItem.connect ('activate', Lang.bind (this, function (object, event) {
+                this._change_sampler(object.label.text);    
+            }));
+        }
+
+        this.statusLabel = new St.Label();
+        let cmd_status = GLib.spawn_command_line_sync (CMD_STATUS);
+        this.statusLabel.set_text(cmd_status[1].toString());
+
+        this.menuEstatus = new PopupMenu.PopupSubMenuMenuItem('Status');
+		this.menuEstatus.menu.box.add(this.statusLabel);
+        this.menu.addMenuItem (this.menuEstatus);
     },
 
     _change_sample_rate: function(rate) {
         // This works!!
         this.sampleRatesMenu.label.set_text("Sample Rate: " + rate + " Hz" );
         changer_output = GLib.spawn_command_line_sync (EXTENSIONDIR + "/genericChanger " + PROPERTY_SAMPLE_RATE+ " " + rate);
-        // [0] exit code
-        // [1] string devuelta
         if(! changer_output[0]) {
             this.sampleRatesMenu.label.set_text("Failed Setting Sample Rate.");
         }
@@ -70,10 +93,16 @@ const FreqAudio = new Lang.Class({
     _change_format: function(format) {
         this.formatMenu.label.set_text("Format: " + format);
         changer_output = GLib.spawn_command_line_sync (EXTENSIONDIR + "/genericChanger " + PROPERTY_FORMAT+ " " + format);
-        // [0] exit code
-        // [1] string devuelta
         if(! changer_output[0]) {
             this.formatMenu.label.set_text("Failed Setting Format.");
+        }
+    },
+
+    _change_sampler: function(sampler) {
+        this.samplerMenu.label.set_text("Sampler: " + sampler);
+        changer_output = GLib.spawn_command_line_sync (EXTENSIONDIR + "/genericChanger " + PROPERTY_SAMPLER + " " + sampler);
+        if(! changer_output[0]) {
+            this.samplerMenu.label.set_text("Failed Setting Sampler.");
         }
     },
 
