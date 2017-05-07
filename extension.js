@@ -16,7 +16,7 @@ const ExtensionSystem = imports.ui.extensionSystem;
 const Me = ExtensionUtils.getCurrentExtension ();
 const EXTENSIONDIR = Me.dir.get_path ();
 const PROPERTY_SAMPLE_RATE = "default-sample-rate"
-
+const RATES = ["44100", "48000", "96000", "192000"];
 
 const FreqAudio = new Lang.Class({
     Name: 'FreqAudio',
@@ -30,35 +30,16 @@ const FreqAudio = new Lang.Class({
         _box.add_actor(this.statusLabel);
         this.actor.add_actor(_box);
 
-        this.sampleRatesMenu = new PopupMenu.PopupSubMenuMenuItem('Sample Rates', false);
+        this.sampleRatesMenu = new PopupMenu.PopupSubMenuMenuItem('Sample Rate (Hz)', false);
         this.menu.addMenuItem (this.sampleRatesMenu);
 
-        let sample1 = new PopupMenu.PopupMenuItem ('44100 Hz');
-        let sample2 = new PopupMenu.PopupMenuItem ('48000 Hz');
-        let sample3 = new PopupMenu.PopupMenuItem ('96000 Hz');
-        let sample4 = new PopupMenu.PopupMenuItem ('192000 Hz');
-        this.sampleRatesMenu.menu.addMenuItem (sample1);
-        this.sampleRatesMenu.menu.addMenuItem (sample2);
-        this.sampleRatesMenu.menu.addMenuItem (sample3);
-        this.sampleRatesMenu.menu.addMenuItem (sample4);
-
-        sample1.connect ('activate', Lang.bind (this, function () {
-            this._change_sample_rate("44100");    
-        }));
-
-        sample2.connect ('activate', Lang.bind (this, function () {
-            this._change_sample_rate("48000");    
-        }));
-
-        sample3.connect ('activate', Lang.bind (this, function () {
-            this._change_sample_rate("96000");    
-        }));
-
-        sample4.connect ('activate', Lang.bind (this, function () {
-            this._change_sample_rate("192000");    
-        }));
-
-        
+        for (let i = 0; i < RATES.length; i++) {
+            let menuItem = new PopupMenu.PopupMenuItem (RATES[i]);
+            this.sampleRatesMenu.menu.addMenuItem (menuItem);
+             menuItem.connect ('activate', Lang.bind (this, function (object, event) {
+                this._change_sample_rate(object.label.text);    
+            }));
+        }
         
     },
 
