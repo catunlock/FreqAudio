@@ -40,6 +40,7 @@ const FreqAudio = new Lang.Class({
         _box.add_actor(this.updateIcon);
         this.actor.add_actor(_box);
 
+
         this.sampleRatesMenu = new PopupMenu.PopupSubMenuMenuItem('Sample Rate (Hz)', false);
         this.menu.addMenuItem (this.sampleRatesMenu);
 

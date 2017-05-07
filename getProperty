@@ -1,0 +1,4 @@
+#!/bin/bash
+
+TXT=$(grep $1 ~/.config/pulse/daemon.conf)
+echo ${TXT##*=}
