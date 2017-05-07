@@ -8,6 +8,7 @@ const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const Util = imports.misc.util;
+const Gtk = imports.gi.Gtk;
 const Mainloop = imports.mainloop;
 
 //let event = null;
@@ -30,10 +31,13 @@ const FreqAudio = new Lang.Class({
 
     _init: function () {
         this.parent (0.0, "Freq change pulseaudio", false);   
+        
+        Gtk.IconTheme.get_default().append_search_path(Me.dir.get_child('icons').get_path());
 
-        this.statusLabel = new St.Label ({text: "FreqAudio", y_expand: true, y_align: Clutter.ActorAlign.CENTER});
+		this.updateIcon = new St.Icon({icon_name: "freq", style_class: 'system-status-icon'});
+
         let _box = new St.BoxLayout();
-        _box.add_actor(this.statusLabel);
+        _box.add_actor(this.updateIcon);
         this.actor.add_actor(_box);
 
         this.sampleRatesMenu = new PopupMenu.PopupSubMenuMenuItem('Sample Rate (Hz)', false);
