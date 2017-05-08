@@ -120,7 +120,7 @@ const FreqAudio = new Lang.Class({
         if(! changer_output[0]) {
             this.sampleRatesMenu.label.set_text("Failed Setting Sample Rate.");
         }
-        updateStatus();
+        this.updateStatus();
     },
 
     _change_format: function(format) {
@@ -129,7 +129,7 @@ const FreqAudio = new Lang.Class({
         if(! changer_output[0]) {
             this.formatMenu.label.set_text("Failed Setting Format.");
         }
-        updateStatus();
+        this.updateStatus();
     },
 
     _change_sampler: function(sampler) {
@@ -138,7 +138,7 @@ const FreqAudio = new Lang.Class({
         if(! changer_output[0]) {
             this.samplerMenu.label.set_text("Failed Setting Sampler.");
         }
-        updateStatus();
+        this.updateStatus();
     },
 
     updateStatus: function() {
