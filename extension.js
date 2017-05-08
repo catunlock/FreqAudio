@@ -160,13 +160,10 @@ function init () {
 
 function enable () {
   freqAudio = new FreqAudio;
-  // addToStatusArea se refiere a que lo va a añadir a la parte del panel
-  // donde esta el estado de las cosas, no en el desplegablel de la esquina.
   Main.panel.addToStatusArea('freqAudio', freqAudio);
 }
 
 function disable () {
   freqAudio.destroy();
-  //Mainloop.source_remove(event);
   freqAudio = null;
 }

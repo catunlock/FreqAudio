@@ -1,5 +1,5 @@
 {"name": "FreqAudio",
- "description": "Allow you to change the sample rate and sample format of your sound card.",
+ "description": "Allow you to change the sample rate, sample format and resampler of pulseaudio. For each change made, the extension stops pulseaudio server, modify the user config file, and start the server again.",
  "uuid": "freqAudio@albertoxp1.gmail.com",
  "shell-version": ["3.22.3"]
  }
