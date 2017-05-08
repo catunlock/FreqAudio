@@ -1,4 +1,14 @@
 #!/bin/bash
 
-TXT=$(grep $1 ~/.config/pulse/daemon.conf)
+if [ "$#" -ne 1 ]; then
+    echo "Illegal number of parameters"
+    exit 1
+fi
+
+if [ ! -f $HOME/.config/pulse/daemon.conf ]; then
+    exit 1
+fi
+
+
+TXT=$(grep $1 $HOME/.config/pulse/daemon.conf)
 echo ${TXT##*=}

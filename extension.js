@@ -78,12 +78,39 @@ const FreqAudio = new Lang.Class({
         }
 
         this.statusLabel = new St.Label();
-        let cmd_status = GLib.spawn_command_line_sync (CMD_STATUS);
-        this.statusLabel.set_text(cmd_status[1].toString());
+        this.updateStatus();
 
         this.menuEstatus = new PopupMenu.PopupSubMenuMenuItem('Status');
 		this.menuEstatus.menu.box.add(this.statusLabel);
         this.menu.addMenuItem (this.menuEstatus);
+
+
+        // Checking the previous state
+        let cmd_property_rate = GLib.spawn_command_line_sync (EXTENSIONDIR + "/getProperty " + PROPERTY_SAMPLE_RATE);
+        if(cmd_property_rate[0]) {
+            let str_property_rate = cmd_property_rate[1].toString().split("\n")[0];
+            if (str_property_rate != "") {
+                this.sampleRatesMenu.label.set_text("Sample Rate: " + str_property_rate + " Hz" );
+            }
+        }
+
+
+        let cmd_property_format = GLib.spawn_command_line_sync (EXTENSIONDIR + "/getProperty " + PROPERTY_FORMAT);
+        if(cmd_property_format[0]) {
+            let str_property_format = cmd_property_format[1].toString().split("\n")[0];
+            if (str_property_format != "") {
+                this.formatMenu.label.set_text("Format: " + str_property_format);
+            }
+        }
+
+
+        let cmd_property_sampler = GLib.spawn_command_line_sync (EXTENSIONDIR + "/getProperty " + PROPERTY_SAMPLER);
+        if(cmd_property_sampler[0]) {
+            let str_property_sampler = cmd_property_sampler[1].toString().split("\n")[0];
+            if (str_property_sampler != "") {
+                this.samplerMenu.label.set_text("Sampler: " + str_property_sampler);
+            }
+        }
     },
 
     _change_sample_rate: function(rate) {
@@ -93,6 +120,7 @@ const FreqAudio = new Lang.Class({
         if(! changer_output[0]) {
             this.sampleRatesMenu.label.set_text("Failed Setting Sample Rate.");
         }
+        updateStatus();
     },
 
     _change_format: function(format) {
@@ -101,6 +129,7 @@ const FreqAudio = new Lang.Class({
         if(! changer_output[0]) {
             this.formatMenu.label.set_text("Failed Setting Format.");
         }
+        updateStatus();
     },
 
     _change_sampler: function(sampler) {
@@ -109,18 +138,12 @@ const FreqAudio = new Lang.Class({
         if(! changer_output[0]) {
             this.samplerMenu.label.set_text("Failed Setting Sampler.");
         }
+        updateStatus();
     },
 
-    _read_line: function (dis) {
-        let line;
-        try {
-            dis.seek (0, GLib.SeekType.SET, null);
-            [line,] = dis.read_line (null);
-        } catch (e) {
-            print ("Error: ", e.message);
-            this._init_streams ();
-        }
-        return line;
+    updateStatus: function() {
+        let cmd_status = GLib.spawn_command_line_sync (CMD_STATUS);
+        this.statusLabel.set_text(cmd_status[1].toString());
     },
 
 });
